@@ -367,12 +367,13 @@
       ts: Date.now(),
     };
 
-    // Salvar no localStorage para sincronização local
-    try {
-      const existing = JSON.parse(localStorage.getItem('mural_posts') || '[]');
-      existing.push(post);
-      localStorage.setItem('mural_posts', JSON.stringify(existing));
-    } catch(e){}
+    // Enviar para o Firebase Realtime Database (sincroniza com o telão em tempo real)
+    const FIREBASE_URL = 'https://mural-senac-bf1ce-default-rtdb.firebaseio.com';
+    fetch(FIREBASE_URL + '/posts/' + post.id + '.json', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(post)
+    }).catch(e=>{});
 
     // Tela de sucesso
     document.getElementById('prev-nome').textContent = currentNome + (colega ? ' × '+colega : '');
