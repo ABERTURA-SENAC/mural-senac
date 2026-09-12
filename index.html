@@ -436,20 +436,23 @@ try {
     `<div style="padding:1rem;font-size:11px;color:#666;word-break:break-all">${ALUNO_URL}</div>`;
 }
 
-// ── DADOS & SINCRONIZAÇÃO ──
+// ── DADOS & SINCRONIZAÇÃO (Firebase Realtime Database) ──
+const FIREBASE_URL = 'https://mural-senac-bf1ce-default-rtdb.firebaseio.com';
 let posts = [];
 let pausado = false;
 let lastCheck = 0;
 
-function carregarPosts() {
+async function carregarPosts() {
   try {
-    const saved = JSON.parse(localStorage.getItem('mural_posts') || '[]');
-    return saved;
+    const res = await fetch(FIREBASE_URL + '/posts.json');
+    const data = await res.json();
+    if (!data) return [];
+    return Object.values(data);
   } catch(e) { return []; }
 }
 
-function salvarPosts(arr) {
-  try { localStorage.setItem('mural_posts', JSON.stringify(arr)); } catch(e){}
+async function limparPostsRemoto() {
+  try { await fetch(FIREBASE_URL + '/posts.json', { method: 'DELETE' }); } catch(e){}
 }
 
 function toast(msg) {
@@ -521,9 +524,9 @@ function atualizarStats() {
   `).join('');
 }
 
-function sincronizar() {
+async function sincronizar() {
   if(pausado) return;
-  const saved = carregarPosts();
+  const saved = await carregarPosts();
   const novos = saved.filter(s => !posts.find(p=>p.id===s.id));
   novos.forEach(p => {
     posts.push(p);
@@ -542,7 +545,7 @@ function togglePausa() {
 function limparMural() {
   if(!confirm('Limpar todos os posts do mural?')) return;
   posts = [];
-  salvarPosts([]);
+  limparPostsRemoto();
   const grid = document.getElementById('posts-grid');
   grid.innerHTML = `<div class="empty-state" id="empty-state"><div class="icon">💬</div><p>Aguardando as primeiras conexões…<br>Peça para a turma escanear o QR code!</p></div>`;
   atualizarStats();
