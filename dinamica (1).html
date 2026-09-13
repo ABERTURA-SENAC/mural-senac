@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dinâmica de Abertura — Curso Técnico em Administração</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1a1f3c;
+    --navy2: #252b52;
+    --blue: #3b6bff;
+    --blue2: #5c85ff;
+    --teal: #00c9a7;
+    --amber: #ffc045;
+    --pink: #ff6b9d;
+    --purple: #a06bff;
+    --text: #f0f2ff;
+    --text2: #9ba3cc;
+    --card: rgba(255,255,255,0.06);
+    --card-border: rgba(255,255,255,0.1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  #particles-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .page { position: relative; z-index: 1; }
+
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,107,255,0.18) 0%, transparent 70%);
+    pointer-events: none;
+    animation: pulse-glow 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.15); opacity: 1; }
+  }
+
+  .senac-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border: 1px solid rgba(59,107,255,0.4);
+    border-radius: 40px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--blue2);
+    letter-spacing: .06em;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(8px);
+    background: rgba(59,107,255,0.08);
+    animation: fade-down .8s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.6rem, 7vw, 5.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    animation: fade-up 1s ease both .1s;
+  }
+
+  .hero-title span {
+    background: linear-gradient(135deg, var(--blue2), var(--teal));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--text2);
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    animation: fade-up 1s ease both .25s;
+  }
+
+  .hero-pills {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 3rem;
+    animation: fade-up 1s ease both .35s;
+  }
+
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 40px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--card-border);
+    background: var(--card);
+    backdrop-filter: blur(8px);
+  }
+  .pill .dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  .hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: var(--blue);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 0 40px rgba(59,107,255,0.4);
+    animation: fade-up 1s ease both .45s;
+  }
+  .hero-btn:hover { transform: translateY(-2px); box-shadow: 0 0 60px rgba(59,107,255,0.55); }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--text2);
+    font-size: 12px;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  .scroll-hint svg { width: 20px; opacity: .5; }
+
+  @keyframes bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  section {
+    padding: 5rem 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    color: var(--blue2);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .section-body {
+    color: var(--text2);
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 560px;
+    margin-bottom: 3rem;
+  }
+
+  .steps-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .steps-timeline::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 28px;
+    bottom: 28px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--blue), var(--teal), var(--pink));
+    opacity: .3;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .step-item.visible { opacity: 1; transform: translateX(0); }
+
+  .step-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.12);
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .step-content p { font-size: .9rem; color: var(--text2); line-height: 1.6; }
+  .step-time {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.06);
+    color: var(--text2);
+    border: 1px solid var(--card-border);
+  }
+
+  .perguntas-section { background: var(--navy2); padding: 5rem 1.5rem; }
+  .perguntas-inner { max-width: 900px; margin: 0 auto; }
+
+  .cartas-marquee-wrap {
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    margin-bottom: 1rem;
+  }
+
+  .cartas-track {
+    display: flex;
+    gap: 12px;
+    width: max-content;
+    animation: marquee-left 30s linear infinite;
+  }
+  .cartas-track.reverse { animation: marquee-right 35s linear infinite; }
+  .cartas-marquee-wrap:hover .cartas-track { animation-play-state: paused; }
+
+  @keyframes marquee-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes marquee-right {
+    from { transform: translateX(-50%); }
+    to { transform: translateX(0); }
+  }
+
+  .carta-item {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.1rem 1.4rem;
+    min-width: 240px;
+    max-width: 240px;
+    backdrop-filter: blur(8px);
+    cursor: default;
+    transition: border-color .2s, background .2s;
+    flex-shrink: 0;
+  }
+  .carta-item:hover {
+    border-color: rgba(59,107,255,0.5);
+    background: rgba(59,107,255,0.08);
+  }
+  .carta-cat {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--blue2);
+    margin-bottom: 6px;
+  }
+  .carta-txt { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+  .sorteio-box {
+    background: rgba(59,107,255,0.06);
+    border: 1px solid rgba(59,107,255,0.2);
+    border-radius: 24px;
+    padding: 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sorteio-box::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,201,167,0.12), transparent 70%);
+    pointer-events: none;
+  }
+
+  .input-group {
+    display: flex;
+    gap: 8px;
+    max-width: 440px;
+    margin: 0 auto 1.5rem;
+  }
+  .input-group input {
+    flex: 1;
+    padding: 11px 16px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .input-group input:focus { border-color: var(--blue); }
+  .input-group input::placeholder { color: var(--text2); }
+  .input-group button {
+    padding: 11px 20px;
+    background: var(--blue);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .input-group button:hover { opacity: .85; }
+
+  .chips-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    min-height: 36px;
+    margin-bottom: 2rem;
+  }
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px 5px 6px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--text);
+    animation: pop-in .25s ease;
+  }
+  @keyframes pop-in {
+    from { transform: scale(.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .chip-av {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chip-del {
+    background: none; border: none; cursor: pointer;
+    color: var(--text2); font-size: 16px; line-height: 1;
+    padding: 0 2px;
+  }
+
+  .wheels-row {
+    display: flex;
+    gap: 2.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0 0 2rem;
+  }
+  .wheel-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .wheel-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+  .wheel-wrap {
+    position: relative;
+    width: 220px;
+    height: 220px;
+  }
+  .wheel-wrap canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 0 5px rgba(255,255,255,0.08), 0 10px 45px rgba(0,0,0,0.4);
+    transition: transform 4.4s cubic-bezier(.13,.68,.1,1);
+    display: block;
+  }
+  .wheel-pointer {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-top: 18px solid var(--pink);
+    z-index: 2;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,.5));
+  }
+  .wheel-hub {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--navy2);
+    border: 3px solid rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    z-index: 2;
+    box-shadow: 0 2px 10px rgba(0,0,0,.4);
+  }
+  .wheel-wrap.spinning .wheel-hub { animation: hub-pulse .5s ease-in-out infinite; }
+  @keyframes hub-pulse {
+    0%,100% { transform: translate(-50%,-50%) scale(1); }
+    50% { transform: translate(-50%,-50%) scale(1.15); }
+  }
+
+  .sound-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text2);
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    user-select: none;
+  }
+  .sound-toggle input { accent-color: var(--blue); width: 15px; height: 15px; cursor: pointer; }
+
+  .btn-sortear {
+    padding: 14px 40px;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    border: none;
+    border-radius: 50px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 4px 30px rgba(59,107,255,0.35);
+    margin-bottom: 2rem;
+    font-family: 'Syne', sans-serif;
+  }
+  .btn-sortear:hover { transform: scale(1.04); box-shadow: 0 6px 40px rgba(59,107,255,0.5); }
+  .btn-sortear:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  .resultado-card {
+    background: linear-gradient(135deg, rgba(59,107,255,0.15), rgba(0,201,167,0.1));
+    border: 1px solid rgba(0,201,167,0.3);
+    border-radius: 20px;
+    padding: 2rem;
+    display: none;
+    animation: resultado-appear .5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .resultado-card.show { display: block; }
+
+  @keyframes resultado-appear {
+    from { transform: scale(.85) translateY(20px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  .res-nome {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--teal);
+    margin-bottom: .5rem;
+  }
+  .res-pergunta {
+    font-size: 1rem;
+    color: var(--text);
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .progress-line {
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 1.5rem 0 .5rem;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--blue), var(--teal));
+    border-radius: 2px;
+    transition: width .5s ease;
+  }
+  .progress-label { font-size: 12px; color: var(--text2); text-align: left; }
+
+  .confetti-msg {
+    display: none;
+    padding: 2rem;
+    text-align: center;
+  }
+  .confetti-msg.show { display: block; animation: fade-up .6s ease; }
+  .confetti-msg h3 { font-family: 'Syne', sans-serif; font-size: 1.4rem; color: var(--teal); margin-bottom: .5rem; }
+  .confetti-msg p { color: var(--text2); font-size: 14px; }
+
+  .timer-section { padding: 5rem 1.5rem; }
+  .timer-section-inner { max-width: 900px; margin: 0 auto; }
+
+  .timer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media(max-width:600px) { .timer-grid { grid-template-columns: 1fr; } }
+
+  .timer-box {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .timer-face {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+  }
+  .timer-face svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .timer-face .ring-bg { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 6; }
+  .timer-face .ring-fg { fill: none; stroke: var(--blue); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset .9s linear, stroke .3s; }
+  .timer-face .ring-fg.warn { stroke: var(--pink); }
+  .timer-number {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    transition: color .3s;
+  }
+  .timer-number.warn { color: var(--pink); }
+
+  .timer-presets { display: flex; gap: 8px; justify-content: center; margin-bottom: 1.2rem; flex-wrap: wrap; }
+  .preset-btn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--card-border);
+    background: transparent;
+    color: var(--text2);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .preset-btn:hover, .preset-btn.active { border-color: var(--blue); color: var(--blue); background: rgba(59,107,255,0.1); }
+
+  .timer-controls { display: flex; gap: 8px; justify-content: center; }
+  .ctrl-btn {
+    padding: 9px 22px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    border: 1px solid var(--card-border);
+    background: transparent;
+    color: var(--text);
+  }
+  .ctrl-btn.primary {
+    background: var(--blue);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 2px 20px rgba(59,107,255,0.3);
+  }
+  .ctrl-btn.primary:hover { opacity: .88; }
+  .ctrl-btn:not(.primary):hover { background: rgba(255,255,255,0.05); }
+
+  .variantes-box {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2rem;
+  }
+  .variante-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--card-border);
+    cursor: pointer;
+    transition: padding-left .2s;
+  }
+  .variante-item:last-child { border-bottom: none; }
+  .variante-item:hover { padding-left: 6px; }
+  .variante-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; color: var(--text); }
+  .variante-item p { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .variante-tag {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--text2);
+    font-size: 12px;
+    border-top: 1px solid var(--card-border);
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-down {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 480px) {
+    .wheel-wrap { width: 170px; height: 170px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-glow"></div>
+
+    <div class="senac-badge">
+      ✦ SENAC SP &nbsp;·&nbsp; Técnico em Administração
+    </div>
+
+    <h1 class="hero-title">
+      Quem sou<br><span>eu aqui?</span>
+    </h1>
+
+    <p class="hero-sub">
+      Uma dinâmica de abertura para conectar a turma antes mesmo de começar a matéria. 30 minutos. Sem nenhum material físico necessário.
+    </p>
+
+    <div class="hero-pills">
+      <div class="pill"><div class="dot" style="background:#3b6bff"></div>10 a 35 alunos</div>
+      <div class="pill"><div class="dot" style="background:#00c9a7"></div>30–50 minutos</div>
+      <div class="pill"><div class="dot" style="background:#ffc045"></div>Presencial ou online</div>
+      <div class="pill"><div class="dot" style="background:#ff6b9d"></div>40 perguntas</div>
+    </div>
+
+    <a href="#passos" class="hero-btn">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      Começar agora
+    </a>
+
+    <div class="scroll-hint">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      rolar
+    </div>
+  </div>
+
+  <section id="passos">
+    <div class="section-label">Como funciona</div>
+    <h2 class="section-title">Quatro momentos,<br>uma turma conectada</h2>
+    <p class="section-body">A sequência é simples. O docente vai na frente, os alunos seguem. O segredo é o sorteio — ninguém sabe qual pergunta vai tirar.</p>
+
+    <div class="steps-timeline">
+      <div class="step-item">
+        <div class="step-circle" style="background:rgba(59,107,255,0.15);border-color:rgba(59,107,255,0.35);color:var(--blue2)">1</div>
+        <div class="step-content">
+          <h3>O docente vai na frente</h3>
+          <p>Sorteia uma carta ao vivo e se apresenta respondendo à pergunta. Isso quebra a hierarquia e cria segurança para os alunos fazerem o mesmo.</p>
+          <span class="step-time">5 min</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle" style="background:rgba(0,201,167,0.12);border-color:rgba(0,201,167,0.3);color:var(--teal)">2</div>
+        <div class="step-content">
+          <h3>Cadastro da turma</h3>
+          <p>Na aba de sorteio abaixo, adicione os nomes de todos os presentes. As duas roletas giram juntas: uma sorteia o aluno, outra a pergunta.</p>
+          <span class="step-time">2 min</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle" style="background:rgba(255,192,69,0.12);border-color:rgba(255,192,69,0.3);color:var(--amber)">3</div>
+        <div class="step-content">
+          <h3>Rodada de apresentações</h3>
+          <p>Gira as roletas, a pergunta aparece para toda a turma, o temporizador começa. O aluno tem 1 minuto. Ninguém vê a pergunta antes de ser sorteado.</p>
+          <span class="step-time">1 min por aluno</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle" style="background:rgba(255,107,157,0.12);border-color:rgba(255,107,157,0.3);color:var(--pink)">4</div>
+        <div class="step-content">
+          <h3>Fechamento com conexões</h3>
+          <p>O docente faz uma síntese dos perfis revelados e conecta as histórias ao propósito do curso. "Percebi que vocês têm em comum…"</p>
+          <span class="step-time">5 min</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="perguntas-section">
+    <div class="perguntas-inner">
+      <div class="section-label reveal">As perguntas</div>
+      <h2 class="section-title reveal">40 cartas,<br>nenhuma repetida</h2>
+      <p class="section-body reveal">Mesmo em turmas grandes, cada aluno sorteia uma pergunta diferente — sem repetição, até 35 alunos. Passe o mouse para pausar e ler.</p>
+    </div>
+
+    <div class="cartas-marquee-wrap" style="margin-bottom:12px">
+      <div class="cartas-track" id="track1"></div>
+    </div>
+    <div class="cartas-marquee-wrap">
+      <div class="cartas-track reverse" id="track2"></div>
+    </div>
+  </div>
+
+  <section id="sorteio">
+    <div class="section-label">Modo docente</div>
+    <h2 class="section-title reveal">Sorteio<br>em tempo real</h2>
+    <p class="section-body reveal">Projete esta página para toda a turma. Cadastre os nomes e gire as roletas ao vivo — com som!</p>
+
+    <div class="sorteio-box reveal">
+      <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Adicione os nomes dos alunos presentes</p>
+      <div class="input-group">
+        <input id="nomeInput" type="text" placeholder="Nome do aluno" onkeydown="if(event.key==='Enter')addAluno()">
+        <button onclick="addAluno()">Adicionar</button>
+      </div>
+      <div id="erroNome" style="font-size:12px;color:#ff6b9d;margin-bottom:8px;display:none">Digite um nome primeiro.</div>
+      <div class="chips-area" id="chipsArea">
+        <span style="color:var(--text2);font-size:13px;align-self:center" id="emptyChips">Nenhum aluno ainda…</span>
+      </div>
+
+      <label class="sound-toggle">
+        <input type="checkbox" id="somCheck" checked>
+        Som durante o sorteio
+      </label>
+
+      <div class="wheels-row">
+        <div class="wheel-col">
+          <span class="wheel-label">Roleta de alunos</span>
+          <div class="wheel-wrap" id="wheelWrapAlunos">
+            <div class="wheel-pointer"></div>
+            <canvas id="wheelAlunos" width="220" height="220"></canvas>
+            <div class="wheel-hub">✦</div>
+          </div>
+        </div>
+        <div class="wheel-col">
+          <span class="wheel-label">Roleta de perguntas</span>
+          <div class="wheel-wrap" id="wheelWrapPerguntas">
+            <div class="wheel-pointer"></div>
+            <canvas id="wheelPerguntas" width="220" height="220"></canvas>
+            <div class="wheel-hub">?</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-sortear" id="btnSortear" onclick="sortear()">
+        ✦ Girar as roletas
+      </button>
+
+      <div class="resultado-card" id="resultadoCard">
+        <p style="font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--teal);margin-bottom:.75rem;text-transform:uppercase">Sorteado</p>
+        <div class="res-nome" id="resNome"></div>
+        <div class="res-pergunta" id="resPergunta"></div>
+      </div>
+
+      <div id="allDone" class="confetti-msg">
+        <h3>🎉 Todos se apresentaram!</h3>
+        <p>Hora do fechamento. Conecte os perfis ao propósito do curso.</p>
+        <button onclick="resetSorteio()" style="margin-top:1rem;padding:8px 24px;border-radius:30px;border:1px solid var(--card-border);background:transparent;color:var(--text);cursor:pointer;font-size:13px">Reiniciar</button>
+      </div>
+
+      <div class="progress-line" id="progressWrap" style="display:none">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-label" id="progressLabel" style="display:none"></div>
+
+      <hr style="border:none;border-top:1px solid var(--card-border);margin:2rem 0 1.5rem">
+
+      <p style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem">Temporizador da apresentação</p>
+
+      <div class="timer-face">
+        <svg viewBox="0 0 140 140">
+          <circle class="ring-bg" cx="70" cy="70" r="62"/>
+          <circle class="ring-fg" id="ringFg" cx="70" cy="70" r="62"
+            stroke-dasharray="389.557"
+            stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-number" id="timerNum">1:00</div>
+      </div>
+
+      <div class="timer-presets">
+        <button class="preset-btn" onclick="setTimer(30)">30s</button>
+        <button class="preset-btn active" onclick="setTimer(60)">1 min</button>
+        <button class="preset-btn" onclick="setTimer(90)">1m30</button>
+        <button class="preset-btn" onclick="setTimer(120)">2 min</button>
+      </div>
+
+      <div class="timer-controls">
+        <button class="ctrl-btn primary" id="ctrlStart" onclick="toggleTimer()">▶ Iniciar</button>
+        <button class="ctrl-btn" onclick="resetTimer()">Resetar</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Dinâmica "Quem sou eu aqui?" &nbsp;·&nbsp; Técnico em Administração &nbsp;·&nbsp; SENAC SP
+  </footer>
+</div>
+
+<script>
+(function(){
+  const c = document.getElementById('particles-canvas');
+  const ctx = c.getContext('2d');
+  let W, H, pts;
+
+  const COLORS = ['#3b6bff','#00c9a7','#ffc045','#ff6b9d'];
+
+  function resize() {
+    W = c.width = window.innerWidth;
+    H = c.height = window.innerHeight;
+  }
+
+  function init() {
+    resize();
+    const count = Math.floor((W * H) / 14000);
+    pts = Array.from({length: count}, () => ({
+      x: Math.random()*W, y: Math.random()*H,
+      vx: (Math.random()-.5)*.4, vy: (Math.random()-.5)*.4,
+      r: Math.random()*2+1,
+      color: COLORS[Math.floor(Math.random()*COLORS.length)],
+      alpha: Math.random()*.5+.15
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.alpha;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < 0) p.x = W;
+      if(p.x > W) p.x = 0;
+      if(p.y < 0) p.y = H;
+      if(p.y > H) p.y = 0;
+    });
+
+    for(let i=0;i<pts.length;i++){
+      for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<120){
+          ctx.beginPath();
+          ctx.moveTo(pts[i].x, pts[i].y);
+          ctx.lineTo(pts[j].x, pts[j].y);
+          ctx.strokeStyle = pts[i].color;
+          ctx.globalAlpha = (1-dist/120)*.08;
+          ctx.lineWidth = .5;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); init(); });
+  init(); draw();
+})();
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: .15 });
+
+document.querySelectorAll('.reveal, .step-item').forEach(el => observer.observe(el));
+
+const PERGUNTAS = [
+  { cat:"profissão",    txt:"Por que você escolheu a área de Administração?" },
+  { cat:"trajetória",   txt:"Qual experiência de trabalho mais te ensinou algo?" },
+  { cat:"meta",         txt:"Onde você quer estar profissionalmente em 2 anos?" },
+  { cat:"habilidade",   txt:"Qual habilidade sua será mais útil neste curso?" },
+  { cat:"curiosidade",  txt:"Conte algo sobre você que a maioria não saberia." },
+  { cat:"desafio",      txt:"Qual é o maior desafio que você espera encontrar aqui?" },
+  { cat:"inspiração",   txt:"Quem te inspirou a investir na sua formação?" },
+  { cat:"rotina",       txt:"Como é o seu dia a dia — você trabalha, estuda ou os dois?" },
+  { cat:"expectativa",  txt:"O que você mais quer aprender neste curso?" },
+  { cat:"equipe",       txt:"Você prefere trabalhar sozinho ou em equipe? Por quê?" },
+  { cat:"conquista",    txt:"Qual conquista profissional ou pessoal te orgulha?" },
+  { cat:"mercado",      txt:"Qual área dentro da Administração mais te interessa?" },
+  { cat:"cotidiano",    txt:"O que você faz fora do trabalho e do estudo?" },
+  { cat:"valor",        txt:"Qual princípio você carrega e leva pro trabalho?" },
+  { cat:"aprendizado",  txt:"Você aprende melhor lendo, ouvindo ou praticando?" },
+  { cat:"networking",   txt:"O que você espera levar desta turma além do conhecimento?" },
+  { cat:"tecnologia",   txt:"Que ferramenta digital você não consegue mais viver sem?" },
+  { cat:"missão",       txt:"Se pudesse mudar uma coisa no mercado de trabalho, o que seria?" },
+  { cat:"história",     txt:"Como foi sua trajetória até chegar aqui hoje?" },
+  { cat:"superpoder",   txt:"Se tivesse um superpoder profissional, qual seria?" },
+  { cat:"liderança",    txt:"Você já liderou algum grupo ou projeto? Como foi?" },
+  { cat:"erro",         txt:"Qual erro profissional te ensinou a maior lição?" },
+  { cat:"decisão",      txt:"Qual foi a decisão mais difícil que você já tomou no trabalho?" },
+  { cat:"família",      txt:"Alguém da sua família trabalha ou trabalhou com Administração?" },
+  { cat:"hobby",        txt:"Qual hobby seu ninguém aqui imaginaria que você tem?" },
+  { cat:"livro/filme",  txt:"Que livro, filme ou série te marcou profissionalmente?" },
+  { cat:"gestão",       txt:"O que você acha que faz um bom gestor?" },
+  { cat:"comunicação",  txt:"Você se considera mais de falar ou de ouvir numa reunião?" },
+  { cat:"pressão",      txt:"Como você reage quando o prazo está apertado?" },
+  { cat:"origem",       txt:"De qual cidade ou bairro você vem, e o que gosta de contar sobre lá?" },
+  { cat:"mudança",      txt:"Qual foi a maior mudança que você fez na sua carreira até agora?" },
+  { cat:"colaboração",  txt:"Conte sobre um trabalho em equipe que deu muito certo." },
+  { cat:"organização",  txt:"Você é mais de planilha e agenda, ou de ir resolvendo na hora?" },
+  { cat:"motivação",    txt:"O que te tira da cama para trabalhar ou estudar todo dia?" },
+  { cat:"futuro",       txt:"Como você imagina o mercado de trabalho daqui a 10 anos?" },
+  { cat:"aprendiz",     txt:"Qual foi a última coisa nova que você aprendeu sozinho?" },
+  { cat:"cliente",      txt:"Já teve alguma experiência marcante atendendo um cliente?" },
+  { cat:"finanças",     txt:"Você tem algum hábito de organização financeira que recomenda?" },
+  { cat:"empreender",   txt:"Já pensou em ter o próprio negócio? Qual seria?" },
+  { cat:"talento",      txt:"Qual talento seu as pessoas costumam elogiar?" },
+];
+
+function buildTrack(el, slice) {
+  const doubled = [...slice, ...slice];
+  el.innerHTML = doubled.map(p => `
+    <div class="carta-item">
+      <div class="carta-cat">${p.cat}</div>
+      <div class="carta-txt">${p.txt}</div>
+    </div>
+  `).join('');
+}
+
+buildTrack(document.getElementById('track1'), PERGUNTAS.slice(0,20));
+buildTrack(document.getElementById('track2'), PERGUNTAS.slice(20));
+
+let alunos = [];
+
+function addAluno() {
+  const inp = document.getElementById('nomeInput');
+  const nome = inp.value.trim();
+  const err = document.getElementById('erroNome');
+  if(!nome) { err.style.display='block'; return; }
+  err.style.display='none';
+  alunos.push(nome);
+  alunosRestantes.push(nome);
+  inp.value='';
+  renderChips();
+  drawWheel(canvasAlunos, alunosRestantes, PAL_ALUNOS);
+}
+
+function removeA(i) {
+  const nome = alunos[i];
+  alunos.splice(i,1);
+  const ri = alunosRestantes.indexOf(nome);
+  if(ri>-1) alunosRestantes.splice(ri,1);
+  renderChips();
+  drawWheel(canvasAlunos, alunosRestantes, PAL_ALUNOS);
+}
+
+function renderChips() {
+  const area = document.getElementById('chipsArea');
+  const empty = document.getElementById('emptyChips');
+  if(!alunos.length) {
+    area.innerHTML = '';
+    area.appendChild(empty);
+    empty.style.display='inline';
+    return;
+  }
+  empty.style.display='none';
+  area.innerHTML = alunos.map((n,i) => {
+    const ini = n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<div class="chip">
+      <div class="chip-av">${ini}</div>
+      <span>${n}</span>
+      <button class="chip-del" onclick="removeA(${i})">×</button>
+    </div>`;
+  }).join('');
+}
+
+const PAL_ALUNOS = ['#3b6bff','#00c9a7','#ffc045','#ff6b9d','#a06bff','#5c85ff'];
+const PAL_PERGUNTAS = ['#ff6b9d','#a06bff','#00c9a7','#ffc045','#3b6bff','#5c85ff'];
+
+const canvasAlunos = document.getElementById('wheelAlunos');
+const canvasPerguntas = document.getElementById('wheelPerguntas');
+const wrapAlunos = document.getElementById('wheelWrapAlunos');
+const wrapPerguntas = document.getElementById('wheelWrapPerguntas');
+
+let alunosRestantes = [];
+let perguntasRestantes = PERGUNTAS.map((p,i)=>i);
+let rotAlunos = 0, rotPerguntas = 0;
+
+function drawWheel(canvas, labels, palette) {
+  const ctx = canvas.getContext('2d');
+  const size = canvas.width;
+  const center = size/2;
+  const radius = center - 3;
+  const n = labels.length;
+  ctx.clearRect(0,0,size,size);
+
+  if(n === 0) {
+    ctx.beginPath();
+    ctx.arc(center,center,radius,0,Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.font = '500 12px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('vazio', center, center+4);
+    return;
+  }
+
+  const anglePer = (2*Math.PI)/n;
+  for(let i=0;i<n;i++){
+    const start = i*anglePer;
+    const end = start+anglePer;
+    ctx.beginPath();
+    ctx.moveTo(center,center);
+    ctx.arc(center,center,radius,start,end);
+    ctx.closePath();
+    ctx.fillStyle = palette[i % palette.length];
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(26,31,60,0.6)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(center,center);
+    ctx.rotate(start+anglePer/2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#fff';
+    ctx.font = '600 11px Inter, sans-serif';
+    let label = labels[i];
+    if(label.length > 14) label = label.slice(0,12)+'…';
+    ctx.fillText(label, radius-12, 4);
+    ctx.restore();
+  }
+}
+
+function drawPerguntasWheel() {
+  const labels = perguntasRestantes.map(i => PERGUNTAS[i].cat);
+  drawWheel(canvasPerguntas, labels, PAL_PERGUNTAS);
+}
+
+drawWheel(canvasAlunos, [], PAL_ALUNOS);
+drawPerguntasWheel();
+
+let audioCtx = null;
+function getAudioCtx() {
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function somAtivo() { return document.getElementById('somCheck').checked; }
+
+function playTicks(durationMs) {
+  if(!somAtivo()) return;
+  const ctx = getAudioCtx();
+  let elapsed = 0;
+  let interval = 55;
+  function tick() {
+    if(elapsed >= durationMs) return;
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = 720;
+    gain.gain.setValueAtTime(0.12, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t+0.045);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(t); osc.stop(t+0.05);
+    elapsed += interval;
+    interval *= 1.055;
+    setTimeout(tick, interval);
+  }
+  tick();
+}
+
+function playChime() {
+  if(!somAtivo()) return;
+  const ctx = getAudioCtx();
+  [523.25, 659.25, 783.99, 1046.5].forEach((freq,i)=>{
+    const t0 = ctx.currentTime + i*0.09;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.linearRampToValueAtTime(0.22, t0+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0+0.5);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(t0); osc.stop(t0+0.55);
+  });
+}
+
+let usados = [];
+let spinning = false;
+
+function targetRotation(currentRot, index, n) {
+  const anglePer = 360/n;
+  const segCenter = (index+0.5)*anglePer;
+  let mod = ((-90 - segCenter) % 360 + 360) % 360;
+  const curMod = ((currentRot % 360) + 360) % 360;
+  let delta = mod - curMod;
+  if(delta <= 0) delta += 360;
+  const extraSpins = 6*360;
+  return currentRot + delta + extraSpins;
+}
+
+function sortear() {
+  if(spinning) return;
+  if(!alunosRestantes.length) return;
+
+  spinning = true;
+  document.getElementById('btnSortear').disabled = true;
+  document.getElementById('resultadoCard').classList.remove('show');
+  document.getElementById('allDone').classList.remove('show');
+
+  const idxAluno = Math.floor(Math.random()*alunosRestantes.length);
+  const nomeEscolhido = alunosRestantes[idxAluno];
+
+  if(!perguntasRestantes.length) perguntasRestantes = PERGUNTAS.map((p,i)=>i);
+  const idxPerguntaLocal = Math.floor(Math.random()*perguntasRestantes.length);
+  const perguntaIdxGlobal = perguntasRestantes[idxPerguntaLocal];
+  const pergunta = PERGUNTAS[perguntaIdxGlobal];
+
+  rotAlunos = targetRotation(rotAlunos, idxAluno, alunosRestantes.length);
+  rotPerguntas = targetRotation(rotPerguntas, idxPerguntaLocal, perguntasRestantes.length);
+
+  wrapAlunos.classList.add('spinning');
+  wrapPerguntas.classList.add('spinning');
+  canvasAlunos.style.transform = `rotate(${rotAlunos}deg)`;
+  canvasPerguntas.style.transform = `rotate(${rotPerguntas}deg)`;
+
+  playTicks(4200);
+
+  setTimeout(() => {
+    wrapAlunos.classList.remove('spinning');
+    wrapPerguntas.classList.remove('spinning');
+    spinning = false;
+
+    usados.push(nomeEscolhido);
+    alunosRestantes.splice(idxAluno,1);
+    perguntasRestantes.splice(idxPerguntaLocal,1);
+
+    drawWheel(canvasAlunos, alunosRestantes, PAL_ALUNOS);
+    drawPerguntasWheel();
+
+    playChime();
+
+    document.getElementById('resNome').textContent = nomeEscolhido;
+    document.getElementById('resPergunta').textContent = `"${pergunta.txt}"`;
+    document.getElementById('resultadoCard').classList.add('show');
+
+    const pct = Math.round(usados.length/alunos.length*100);
+    const pw = document.getElementById('progressWrap');
+    const pl = document.getElementById('progressLabel');
+    pw.style.display='block'; pl.style.display='block';
+    document.getElementById('progressFill').style.width = pct+'%';
+    pl.textContent = `${usados.length} de ${alunos.length} apresentados`;
+
+    if(alunosRestantes.length === 0) {
+      setTimeout(()=>{
+        document.getElementById('resultadoCard').classList.remove('show');
+        document.getElementById('allDone').classList.add('show');
+      }, 1400);
+    } else {
+      document.getElementById('btnSortear').disabled = false;
+    }
+  }, 4400);
+}
+
+function resetSorteio() {
+  usados = [];
+  alunosRestantes = alunos.slice();
+  perguntasRestantes = PERGUNTAS.map((p,i)=>i);
+  rotAlunos = 0; rotPerguntas = 0;
+  canvasAlunos.style.transition = 'none';
+  canvasPerguntas.style.transition = 'none';
+  canvasAlunos.style.transform = 'rotate(0deg)';
+  canvasPerguntas.style.transform = 'rotate(0deg)';
+  requestAnimationFrame(()=>{
+    canvasAlunos.style.transition = '';
+    canvasPerguntas.style.transition = '';
+  });
+  drawWheel(canvasAlunos, alunosRestantes, PAL_ALUNOS);
+  drawPerguntasWheel();
+  document.getElementById('btnSortear').disabled = false;
+  document.getElementById('resultadoCard').classList.remove('show');
+  document.getElementById('allDone').classList.remove('show');
+  document.getElementById('progressWrap').style.display='none';
+  document.getElementById('progressLabel').style.display='none';
+}
+
+const CIRCUM = 2*Math.PI*62;
+let timerTotal=60, timerLeft=60, tRunning=false, tInterval=null;
+
+function setTimer(s) {
+  clearInterval(tInterval); tRunning=false;
+  timerTotal=s; timerLeft=s;
+  document.querySelectorAll('.preset-btn').forEach(b=>{
+    b.classList.toggle('active', b.textContent.trim()===formatT(s));
+  });
+  document.getElementById('ctrlStart').textContent='▶ Iniciar';
+  renderTimer();
+}
+
+function formatT(s) {
+  if(s<60) return s+'s';
+  const m=Math.floor(s/60), r=s%60;
+  return r ? `${m}m${r}0` : `${m} min`;
+}
+
+function renderTimer() {
+  const pct = timerLeft/timerTotal;
+  const offset = CIRCUM*(1-pct);
+  const ring = document.getElementById('ringFg');
+  ring.style.strokeDashoffset=offset;
+  ring.classList.toggle('warn', timerLeft<=10);
+  const m=Math.floor(timerLeft/60), s=timerLeft%60;
+  const num=document.getElementById('timerNum');
+  num.textContent = m>0 ? `${m}:${String(s).padStart(2,'0')}` : `0:${String(s).padStart(2,'0')}`;
+  num.classList.toggle('warn', timerLeft<=10);
+}
+
+function toggleTimer() {
+  const btn=document.getElementById('ctrlStart');
+  if(tRunning) {
+    clearInterval(tInterval); tRunning=false;
+    btn.textContent='▶ Retomar';
+  } else {
+    if(timerLeft<=0) resetTimer();
+    tRunning=true;
+    btn.textContent='⏸ Pausar';
+    tInterval=setInterval(()=>{
+      timerLeft--;
+      renderTimer();
+      if(timerLeft<=0){
+        clearInterval(tInterval); tRunning=false;
+        btn.textContent='▶ Iniciar';
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(tInterval); tRunning=false;
+  timerLeft=timerTotal;
+  document.getElementById('ctrlStart').textContent='▶ Iniciar';
+  renderTimer();
+}
+
+renderTimer();
+</script>
+</body>
+</html>
