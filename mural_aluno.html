@@ -3,127 +3,396 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Entrar na roleta — Dinâmica de Abertura</title>
+<title>Mural da Turma — Minha Contribuição</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #1a1f3c;
+    --navy2: #252b52;
+    --blue: #3b6bff;
+    --teal: #00c9a7;
+    --amber: #ffc045;
+    --pink: #ff6b9d;
+    --purple: #9b6dff;
+    --text: #f0f2ff;
+    --text2: #9ba3cc;
+    --card: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.1);
+  }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #1a1f3c;
-    color: #f0f2ff;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--navy);
+    color: var(--text);
     min-height: 100vh;
-    display: flex;
+    padding: 0;
+  }
+
+  .screen { display: none; flex-direction: column; min-height: 100vh; }
+  .screen.active { display: flex; }
+
+  /* TELA 1 — ENTRADA */
+  .s-entry {
     align-items: center;
     justify-content: center;
-    padding: 1.5rem;
-  }
-  .card {
-    width: 100%;
-    max-width: 420px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px;
     padding: 2rem 1.5rem;
     text-align: center;
+    background: radial-gradient(ellipse at 50% 0%, rgba(59,107,255,0.18) 0%, transparent 60%);
   }
-  .badge {
-    display: inline-block;
-    padding: 5px 14px;
-    border-radius: 30px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    background: rgba(59,107,255,0.12);
-    color: #5c85ff;
-    border: 1px solid rgba(59,107,255,0.35);
-    margin-bottom: 1rem;
+  .entry-logo {
+    width: 64px; height: 64px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 0 40px rgba(59,107,255,0.4);
   }
-  h1 { font-size: 1.4rem; font-weight: 800; margin-bottom: .5rem; }
-  p.sub { color: #9ba3cc; font-size: .9rem; margin-bottom: 1.75rem; line-height: 1.5; }
-  input {
+  .entry-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: .5rem;
+    line-height: 1.2;
+  }
+  .entry-sub { color: var(--text2); font-size: .95rem; margin-bottom: 2rem; line-height: 1.6; }
+  .entry-input-group { width: 100%; max-width: 340px; margin: 0 auto; }
+  .entry-input-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 8px; text-align: left; }
+  .big-input {
     width: 100%;
     padding: 14px 16px;
-    font-size: 16px;
     background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 12px;
-    color: #f0f2ff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--text);
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
     outline: none;
-    margin-bottom: 1rem;
+    transition: border-color .2s;
+    margin-bottom: 12px;
   }
-  input:focus { border-color: #3b6bff; }
-  input::placeholder { color: #9ba3cc; }
-  button {
+  .big-input:focus { border-color: var(--blue); }
+  .big-input::placeholder { color: var(--text2); }
+  .big-btn {
     width: 100%;
     padding: 14px;
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    border: none;
+    border-radius: 14px;
+    color: #fff;
     font-size: 15px;
     font-weight: 700;
-    border: none;
-    border-radius: 30px;
-    background: linear-gradient(135deg, #3b6bff, #00c9a7);
-    color: #fff;
     cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    transition: opacity .2s, transform .15s;
+    box-shadow: 0 4px 30px rgba(59,107,255,0.35);
   }
-  button:disabled { opacity: .5; }
-  .err { color: #ff6b9d; font-size: 13px; margin: -0.5rem 0 1rem; display: none; }
-  .success { display: none; }
-  .success.show { display: block; }
-  .form.hide { display: none; }
-  .check { font-size: 42px; margin-bottom: .75rem; }
-  .nome-confirmado { font-size: 1.2rem; font-weight: 800; color: #00c9a7; margin-bottom: .5rem; }
+  .big-btn:hover { opacity: .9; transform: translateY(-1px); }
+  .big-btn:active { transform: scale(.98); }
+  .error-msg { color: var(--pink); font-size: 12px; margin-top: 4px; display: none; }
+
+  /* TELA 2 — FORMULÁRIO */
+  .s-form { padding: 1.5rem; }
+  .form-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .form-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .form-header-text h2 { font-size: 1rem; font-weight: 600; }
+  .form-header-text p { font-size: 12px; color: var(--text2); }
+
+  .question-block { margin-bottom: 2rem; }
+  .q-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .q-main {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .textarea-styled {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    resize: vertical;
+    min-height: 90px;
+    transition: border-color .2s;
+    line-height: 1.6;
+  }
+  .textarea-styled:focus { border-color: var(--blue); }
+  .textarea-styled::placeholder { color: var(--text2); }
+  .char-count { font-size: 11px; color: var(--text2); text-align: right; margin-top: 4px; }
+
+  .color-picker { margin-bottom: 2rem; }
+  .color-picker span { font-size: 13px; font-weight: 600; color: var(--text2); display: block; margin-bottom: 10px; }
+  .colors-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .color-opt {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform .15s, border-color .15s;
+    flex-shrink: 0;
+  }
+  .color-opt:hover { transform: scale(1.15); }
+  .color-opt.selected { border-color: #fff; transform: scale(1.2); }
+
+  .emoji-picker { margin-bottom: 2rem; }
+  .emoji-picker span { font-size: 13px; font-weight: 600; color: var(--text2); display: block; margin-bottom: 10px; }
+  .emojis-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .emoji-opt {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .emoji-opt:hover { background: rgba(255,255,255,0.12); transform: scale(1.1); }
+  .emoji-opt.selected { background: rgba(59,107,255,0.2); border-color: var(--blue); transform: scale(1.1); }
+
+  /* TELA 3 — SUCESSO */
+  .s-success {
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+  }
+  .success-icon { font-size: 64px; margin-bottom: 1.5rem; animation: bounce-in .6s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes bounce-in { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .success-title { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: .5rem; }
+  .success-sub { color: var(--text2); font-size: .9rem; line-height: 1.6; max-width: 300px; margin: 0 auto 2rem; }
+  .preview-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    max-width: 340px;
+    margin: 0 auto 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .preview-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+  }
+  .preview-card-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .preview-card-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+  .outro-btn {
+    padding: 10px 28px;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .outro-btn:hover { background: rgba(255,255,255,0.06); }
 </style>
 </head>
 <body>
-  <div class="card">
-    <div class="badge">SENAC SP</div>
 
-    <div class="form" id="formArea">
-      <h1>Quem sou eu aqui?</h1>
-      <p class="sub">Digite seu nome para entrar na roleta de apresentações.</p>
-      <input id="nomeInput" type="text" placeholder="Seu nome" autocomplete="off" onkeydown="if(event.key==='Enter')enviar()">
-      <div class="err" id="erro">Digite seu nome antes de continuar.</div>
-      <button id="btnEnviar" onclick="enviar()">Entrar na roleta</button>
-    </div>
+<!-- TELA 1: ENTRADA -->
+<div class="screen s-entry active" id="screen-entry">
+  <div class="entry-logo">✦</div>
+  <h1 class="entry-title">Mural<br>da Turma</h1>
+  <p class="entry-sub">Sua voz vai aparecer no telão.<br>Conta para a turma um ponto em comum<br>que você encontrou com alguém aqui.</p>
+  <div class="entry-input-group">
+    <label for="inp-nome">Seu nome</label>
+    <input class="big-input" id="inp-nome" type="text" placeholder="Como você se chama?" maxlength="40" autocomplete="off">
+    <div id="err-nome" class="error-msg">Por favor, escreva seu nome.</div>
+    <button class="big-btn" onclick="entrar()">Entrar no mural →</button>
+  </div>
+</div>
 
-    <div class="success" id="successArea">
-      <div class="check">✦</div>
-      <div class="nome-confirmado" id="nomeConfirmado"></div>
-      <p class="sub">Você está na roleta! Aguarde ser chamado no telão.</p>
+<!-- TELA 2: FORMULÁRIO -->
+<div class="screen s-form" id="screen-form">
+  <div class="form-header">
+    <div class="form-avatar" id="form-avatar"></div>
+    <div class="form-header-text">
+      <h2 id="form-nome-header"></h2>
+      <p>Contribuição para o mural</p>
     </div>
   </div>
 
+  <div class="question-block">
+    <span class="q-label">O que vocês têm em comum?</span>
+    <p class="q-main">Qual ponto em comum você descobriu com alguém da turma durante as apresentações?</p>
+    <textarea class="textarea-styled" id="txt-comum"
+      placeholder="Ex: eu e a Maria descobrimos que os dois viemos de um curso técnico antes de entrar aqui…"
+      maxlength="180"
+      oninput="document.getElementById('cc1').textContent=this.value.length+'/180'"></textarea>
+    <div class="char-count"><span id="cc1">0</span>/180</div>
+  </div>
+
+  <div class="question-block">
+    <span class="q-label">Com quem você conectou?</span>
+    <p class="q-main">Nome do(a) colega com quem você encontrou essa conexão</p>
+    <input class="big-input" id="inp-colega" type="text" placeholder="Nome do colega" maxlength="40" autocomplete="off">
+  </div>
+
+  <div class="color-picker">
+    <span>Cor do seu cartão</span>
+    <div class="colors-row" id="colorsRow"></div>
+  </div>
+
+  <div class="emoji-picker">
+    <span>Um emoji que representa essa conexão</span>
+    <div class="emojis-row" id="emojisRow"></div>
+  </div>
+
+  <div id="err-form" class="error-msg" style="margin-bottom:12px">Preencha o campo "em comum" antes de enviar.</div>
+  <button class="big-btn" onclick="enviar()">Publicar no mural ✦</button>
+  <div style="height:2rem"></div>
+</div>
+
+<!-- TELA 3: SUCESSO -->
+<div class="screen s-success" id="screen-success">
+  <div class="success-icon">🎉</div>
+  <h2 class="success-title">No ar!</h2>
+  <p class="success-sub">Sua contribuição já está aparecendo no telão. Olha lá!</p>
+  <div class="preview-card" id="preview-card">
+    <div class="preview-card-name" id="prev-nome"></div>
+    <div class="preview-card-text" id="prev-text"></div>
+  </div>
+  <button class="outro-btn" onclick="novaContrib()">Adicionar outra contribuição</button>
+</div>
+
 <script>
-  const FIREBASE_URL = 'https://mural-senac-bf1ce-default-rtdb.firebaseio.com';
+  const CORES = [
+    { hex:'#3b6bff', name:'azul' },
+    { hex:'#00c9a7', name:'teal' },
+    { hex:'#ffc045', name:'amber' },
+    { hex:'#ff6b9d', name:'pink' },
+    { hex:'#9b6dff', name:'purple' },
+    { hex:'#ff7043', name:'coral' },
+  ];
+  const EMOJIS = ['🤝','💡','🚀','⭐','🎯','💪','🌱','🔥','✨','🎓','💼','🌟'];
+
+  let selectedColor = CORES[0].hex;
+  let selectedEmoji = '🤝';
+  let currentNome = '';
+
+  // Renderizar cores
+  const colorsRow = document.getElementById('colorsRow');
+  CORES.forEach((c,i) => {
+    const el = document.createElement('div');
+    el.className = 'color-opt' + (i===0?' selected':'');
+    el.style.background = c.hex;
+    el.onclick = () => {
+      document.querySelectorAll('.color-opt').forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedColor = c.hex;
+    };
+    colorsRow.appendChild(el);
+  });
+
+  // Renderizar emojis
+  const emojisRow = document.getElementById('emojisRow');
+  EMOJIS.forEach((e,i) => {
+    const el = document.createElement('div');
+    el.className = 'emoji-opt' + (i===0?' selected':'');
+    el.textContent = e;
+    el.onclick = () => {
+      document.querySelectorAll('.emoji-opt').forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedEmoji = e;
+    };
+    emojisRow.appendChild(el);
+  });
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  function entrar() {
+    const nome = document.getElementById('inp-nome').value.trim();
+    const err = document.getElementById('err-nome');
+    if(!nome) { err.style.display='block'; return; }
+    err.style.display='none';
+    currentNome = nome;
+    const ini = nome.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('form-avatar').textContent = ini;
+    document.getElementById('form-nome-header').textContent = nome;
+    showScreen('screen-form');
+  }
 
   function enviar() {
-    const inp = document.getElementById('nomeInput');
-    const erro = document.getElementById('erro');
-    const nome = inp.value.trim();
-    if (!nome) { erro.style.display = 'block'; return; }
-    erro.style.display = 'none';
+    const comum = document.getElementById('txt-comum').value.trim();
+    const colega = document.getElementById('inp-colega').value.trim();
+    const err = document.getElementById('err-form');
+    if(!comum) { err.style.display='block'; return; }
+    err.style.display='none';
 
-    const btn = document.getElementById('btnEnviar');
-    btn.disabled = true;
-    btn.textContent = 'Entrando...';
+    const post = {
+      id: Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      nome: currentNome,
+      colega: colega,
+      comum: comum,
+      cor: selectedColor,
+      emoji: selectedEmoji,
+      ts: Date.now(),
+    };
 
-    const id = Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-
-    fetch(FIREBASE_URL + '/roleta_alunos/' + id + '.json', {
+    // Enviar para o Firebase Realtime Database (sincroniza com o telão em tempo real)
+    const FIREBASE_URL = 'https://mural-senac-bf1ce-default-rtdb.firebaseio.com';
+    fetch(FIREBASE_URL + '/posts/' + post.id + '.json', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome: nome, ts: Date.now() })
-    })
-      .then(() => {
-        document.getElementById('nomeConfirmado').textContent = nome;
-        document.getElementById('formArea').classList.add('hide');
-        document.getElementById('successArea').classList.add('show');
-      })
-      .catch(() => {
-        btn.disabled = false;
-        btn.textContent = 'Entrar na roleta';
-        erro.textContent = 'Não foi possível enviar. Tente novamente.';
-        erro.style.display = 'block';
-      });
+      body: JSON.stringify(post)
+    }).catch(e=>{});
+
+    // Tela de sucesso
+    document.getElementById('prev-nome').textContent = currentNome + (colega ? ' × '+colega : '');
+    document.getElementById('prev-text').textContent = selectedEmoji + ' ' + comum;
+    document.getElementById('preview-card').style.borderLeftColor = selectedColor;
+    document.getElementById('preview-card').style.setProperty('--card-color', selectedColor);
+    document.querySelector('#preview-card::before');
+    const card = document.getElementById('preview-card');
+    card.style.background = selectedColor+'18';
+    card.style.borderColor = selectedColor+'44';
+
+    showScreen('screen-success');
+  }
+
+  function novaContrib() {
+    document.getElementById('txt-comum').value='';
+    document.getElementById('inp-colega').value='';
+    document.getElementById('cc1').textContent='0';
+    showScreen('screen-form');
   }
 </script>
 </body>
