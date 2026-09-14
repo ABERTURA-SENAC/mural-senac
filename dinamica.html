@@ -412,6 +412,57 @@
     padding: 0 2px;
   }
 
+  .cadastro-row {
+    display: flex;
+    gap: 1.5rem;
+    align-items: stretch;
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+  .qr-panel {
+    flex: 0 0 auto;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 160px;
+  }
+  .qr-img {
+    width: 128px;
+    height: 128px;
+    border-radius: 8px;
+    background: #fff;
+    padding: 6px;
+    margin-bottom: .6rem;
+  }
+  .qr-legend {
+    font-size: 11px;
+    color: var(--text2);
+    text-align: center;
+    line-height: 1.4;
+  }
+  .manual-panel { flex: 1; min-width: 0; }
+  .contador-alunos {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal);
+    background: rgba(0,201,167,0.1);
+    border: 1px solid rgba(0,201,167,0.3);
+    padding: 5px 14px;
+    border-radius: 20px;
+  }
+  @media (max-width: 560px) {
+    .cadastro-row { flex-direction: column; align-items: center; }
+    .qr-panel { width: 100%; max-width: 220px; }
+    .manual-panel { width: 100%; text-align: center; }
+  }
+
   .wheels-row {
     display: flex;
     gap: 2.5rem;
@@ -783,12 +834,21 @@
     <p class="section-body reveal">Projete esta página para toda a turma. Cadastre os nomes e gire as roletas ao vivo — com som!</p>
 
     <div class="sorteio-box reveal">
-      <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Adicione os nomes dos alunos presentes</p>
-      <div class="input-group">
-        <input id="nomeInput" type="text" placeholder="Nome do aluno" onkeydown="if(event.key==='Enter')addAluno()">
-        <button onclick="addAluno()">Adicionar</button>
+      <div class="cadastro-row">
+        <div class="qr-panel">
+          <img src="QRCode_Dinamica_Alunos.png" alt="QR code para entrar na roleta" class="qr-img">
+          <p class="qr-legend">Alunos com celular escaneiam aqui e digitam o próprio nome</p>
+        </div>
+        <div class="manual-panel">
+          <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Ou adicione manualmente (para quem não tem celular)</p>
+          <div class="input-group">
+            <input id="nomeInput" type="text" placeholder="Nome do aluno" onkeydown="if(event.key==='Enter')addAluno()">
+            <button onclick="addAluno()">Adicionar</button>
+          </div>
+          <div id="erroNome" style="font-size:12px;color:#ff6b9d;margin-bottom:8px;display:none">Digite um nome primeiro.</div>
+          <div class="contador-alunos"><i>👥</i> <span id="contadorNum">0</span> alunos cadastrados</div>
+        </div>
       </div>
-      <div id="erroNome" style="font-size:12px;color:#ff6b9d;margin-bottom:8px;display:none">Digite um nome primeiro.</div>
       <div class="chips-area" id="chipsArea">
         <span style="color:var(--text2);font-size:13px;align-self:center" id="emptyChips">Nenhum aluno ainda…</span>
       </div>
@@ -998,6 +1058,8 @@ buildTrack(document.getElementById('track1'), PERGUNTAS.slice(0,20));
 buildTrack(document.getElementById('track2'), PERGUNTAS.slice(20));
 
 let alunos = [];
+const FIREBASE_URL = 'https://mural-senac-bf1ce-default-rtdb.firebaseio.com';
+const idsProcessados = new Set();
 
 function addAluno() {
   const inp = document.getElementById('nomeInput');
@@ -1024,6 +1086,8 @@ function removeA(i) {
 function renderChips() {
   const area = document.getElementById('chipsArea');
   const empty = document.getElementById('emptyChips');
+  const contador = document.getElementById('contadorNum');
+  if (contador) contador.textContent = alunos.length;
   if(!alunos.length) {
     area.innerHTML = '';
     area.appendChild(empty);
@@ -1039,6 +1103,35 @@ function renderChips() {
       <button class="chip-del" onclick="removeA(${i})">×</button>
     </div>`;
   }).join('');
+}
+
+// ── Sincronização com os cadastros feitos pelo QR code (celular dos alunos) ──
+async function sincronizarAlunosRemotos() {
+  try {
+    const res = await fetch(FIREBASE_URL + '/roleta_alunos.json');
+    const data = await res.json();
+    if (!data) return;
+    const entradas = Object.entries(data).sort((a, b) => (a[1].ts || 0) - (b[1].ts || 0));
+    let mudou = false;
+    entradas.forEach(([id, val]) => {
+      if (idsProcessados.has(id) || !val || !val.nome) return;
+      idsProcessados.add(id);
+      alunos.push(val.nome);
+      alunosRestantes.push(val.nome);
+      mudou = true;
+    });
+    if (mudou) {
+      renderChips();
+      drawWheel(canvasAlunos, alunosRestantes, PAL_ALUNOS);
+    }
+  } catch (e) { /* sem internet momentânea — tenta de novo no próximo ciclo */ }
+}
+setInterval(sincronizarAlunosRemotos, 1500);
+sincronizarAlunosRemotos();
+
+async function limparAlunosRemotos() {
+  try { await fetch(FIREBASE_URL + '/roleta_alunos.json', { method: 'DELETE' }); } catch(e){}
+  idsProcessados.clear();
 }
 
 const PAL_ALUNOS = ['#3b6bff','#00c9a7','#ffc045','#ff6b9d','#a06bff','#5c85ff'];
@@ -1224,10 +1317,9 @@ function sortear() {
     pl.textContent = `${usados.length} de ${alunos.length} apresentados`;
 
     if(alunosRestantes.length === 0) {
-      setTimeout(()=>{
-        document.getElementById('resultadoCard').classList.remove('show');
-        document.getElementById('allDone').classList.add('show');
-      }, 1400);
+      // Mantém a última pergunta visível — não esconde mais o resultado.
+      // A mensagem de conclusão aparece junto, abaixo do resultado.
+      document.getElementById('allDone').classList.add('show');
     } else {
       document.getElementById('btnSortear').disabled = false;
     }
