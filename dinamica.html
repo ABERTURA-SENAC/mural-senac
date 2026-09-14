@@ -445,6 +445,7 @@
     line-height: 1.4;
   }
   .manual-panel { flex: 1; min-width: 0; }
+  .contador-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .contador-alunos {
     display: inline-flex;
     align-items: center;
@@ -457,6 +458,21 @@
     padding: 5px 14px;
     border-radius: 20px;
   }
+  .limpar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pink);
+    background: rgba(255,107,157,0.08);
+    border: 1px solid rgba(255,107,157,0.3);
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .limpar-btn:hover { background: rgba(255,107,157,0.18); }
   @media (max-width: 560px) {
     .cadastro-row { flex-direction: column; align-items: center; }
     .qr-panel { width: 100%; max-width: 220px; }
@@ -893,7 +909,10 @@
             <button onclick="addAluno()">Adicionar</button>
           </div>
           <div id="erroNome" style="font-size:12px;color:#ff6b9d;margin-bottom:8px;display:none">Digite um nome primeiro.</div>
-          <div class="contador-alunos"><i>👥</i> <span id="contadorNum">0</span> alunos cadastrados</div>
+          <div class="contador-row">
+            <div class="contador-alunos"><i>👥</i> <span id="contadorNum">0</span> alunos cadastrados</div>
+            <button class="limpar-btn" onclick="limparTudoAlunos()">🗑 Limpar tudo</button>
+          </div>
         </div>
       </div>
       <div class="chips-area" id="chipsArea">
@@ -1194,6 +1213,38 @@ sincronizarAlunosRemotos();
 async function limparAlunosRemotos() {
   try { await fetch(FIREBASE_URL + '/roleta_alunos.json', { method: 'DELETE' }); } catch(e){}
   idsProcessados.clear();
+}
+
+function limparTudoAlunos() {
+  if (!confirm('Apagar todos os alunos cadastrados (celular e manual)? Isso não pode ser desfeito.')) return;
+
+  alunos = [];
+  alunosRestantes = [];
+  usados = [];
+  perguntasRestantes = PERGUNTAS.map((p, i) => i);
+  rotAlunos = 0;
+  rotPerguntas = 0;
+
+  canvasAlunos.style.transition = 'none';
+  canvasPerguntas.style.transition = 'none';
+  canvasAlunos.style.transform = 'rotate(0deg)';
+  canvasPerguntas.style.transform = 'rotate(0deg)';
+  requestAnimationFrame(() => {
+    canvasAlunos.style.transition = '';
+    canvasPerguntas.style.transition = '';
+  });
+
+  renderChips();
+  drawWheel(canvasAlunos, alunosRestantes, PAL_ALUNOS);
+  drawPerguntasWheel();
+
+  document.getElementById('btnSortear').disabled = false;
+  document.getElementById('resultadoCard').classList.remove('show');
+  document.getElementById('allDone').classList.remove('show');
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('progressLabel').style.display = 'none';
+
+  limparAlunosRemotos();
 }
 
 const PAL_ALUNOS = ['#3b6bff','#00c9a7','#ffc045','#ff6b9d','#a06bff','#5c85ff'];
