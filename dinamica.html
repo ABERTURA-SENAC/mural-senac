@@ -463,6 +463,53 @@
     .manual-panel { width: 100%; text-align: center; }
   }
 
+  .material-box {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2rem;
+    flex-wrap: wrap;
+  }
+  .material-qr {
+    width: 140px;
+    height: 140px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 8px;
+    flex-shrink: 0;
+  }
+  .material-info { flex: 1; min-width: 200px; }
+  .material-titulo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--text);
+    margin-bottom: .4rem;
+  }
+  .material-sub {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 1rem;
+  }
+  .material-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--teal);
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,201,167,0.4);
+    padding-bottom: 2px;
+  }
+  .material-link:hover { border-color: var(--teal); }
+  @media (max-width: 560px) {
+    .material-box { flex-direction: column; text-align: center; }
+  }
+
   .wheels-row {
     display: flex;
     gap: 2.5rem;
@@ -922,6 +969,21 @@
       <div class="timer-controls">
         <button class="ctrl-btn primary" id="ctrlStart" onclick="toggleTimer()">▶ Iniciar</button>
         <button class="ctrl-btn" onclick="resetTimer()">Resetar</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="material-apoio">
+    <div class="section-label reveal">Para levar</div>
+    <h2 class="section-title reveal">Banco de estratégias<br>de ensino-aprendizagem</h2>
+    <p class="section-body reveal">Material de apoio do Senac com estratégias ativas prontas para usar em sala. Escaneie para baixar no celular.</p>
+
+    <div class="material-box reveal">
+      <img src="QRCode_Banco_Estrategias.png" alt="QR code para baixar o banco de estratégias" class="material-qr">
+      <div class="material-info">
+        <p class="material-titulo">Banco de Estratégias de Ensino-Aprendizagem</p>
+        <p class="material-sub">PDF · Senac SP</p>
+        <a href="Banco_Estrategias_Ensino_Aprendizagem.pdf" class="material-link" download>Baixar diretamente →</a>
       </div>
     </div>
   </section>
